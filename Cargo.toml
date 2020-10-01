@@ -1,0 +1,15 @@
+[package]
+name = "som"
+authors = ["Jay Kickliter <jay@helium.com>"]
+build = "native/build.rs"
+edition = "2018"
+version = "0.1.0"
+
+[lib]
+name = "som"
+crate-type = ["dylib"]
+path = "native/som.rs"
+
+[dependencies]
+rusticsom = "1.1.1"
+rustler = "0.22.0-rc.0"
