@@ -63,6 +63,8 @@ impl<'a> Decoder<'a> for SOMOptions {
                     classes.insert(class.decode()?, weight.decode()?);
                 }
                 opts.classes = Some(classes);
+            } else if atom::custom_weighting() == key {
+                opts.custom_weighting = value.decode()?;
             } else {
                 return Err(Error::BadArg);
             }
@@ -77,6 +79,7 @@ impl<'a> Decoder<'a> for SOMOptions {
 
 mod atom {
     rustler::atoms! {
+        custom_weighting,
         classes,
         decay_fn,
         default,
@@ -139,7 +142,7 @@ fn new<'a>(
         opts.decay_fn,
         opts.neighbourhood_fn,
         opts.classes,
-        false,
+        opts.custom_weighting,
     );
     Ok((ok(), ResourceArc::new(SomResource::from(som))).encode(env))
 }
