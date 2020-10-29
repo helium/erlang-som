@@ -1,12 +1,14 @@
 -module(som).
 
 -export([
+    new/4,
     new/5,
     winner/2,
     train_random/3,
     train_random_supervised/4,
     train_random_hybrid/4,
-    train_batch/3
+    train_batch/3,
+    lookup_tag/2
 ]).
 
 -on_load(load/0).
@@ -16,6 +18,9 @@
 -export_type([som/0]).
 
 %% @doc Create a new self organizing map (SOM).
+new(Length, Breadth, Inputs, Randomize) ->
+    new(Length, Breadth, Inputs, Randomize, #{}).
+
 new(_Length, _Breadth, _Inputs, _Randomize, _Options) ->
     not_loaded(?LINE).
 
@@ -32,6 +37,12 @@ train_random_hybrid(_Som, _Data, _Iterations, _Classes) ->
     not_loaded(?LINE).
 
 train_batch(_Som, _Data, _Iterations) ->
+    not_loaded(?LINE).
+
+lookup_tag(Som, {X, Y}) ->
+    lookup_tag(Som, X, Y).
+
+lookup_tag(_Som, X, Y) ->
     not_loaded(?LINE).
 
 load() ->

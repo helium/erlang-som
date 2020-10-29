@@ -1,7 +1,7 @@
 use ndarray::{Array1, Array2};
 use rusticsom::{SOM,gaussian,mh_neighborhood,exponential_decay_fn,default_decay_fn,DecayFn,NeighbourhoodFn};
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
-use rustler::{Decoder, Encoder, NifResult, Term};
+use rustler::{Decoder, Encoder, NifResult, Term, Atom};
 use rustler::resource::ResourceArc;
 use rustler::types::atom::ok;
 use std::collections::HashMap;
@@ -13,6 +13,7 @@ pub struct SOMOptions {
     pub decay_fn: Option<DecayFn>,
     pub neighbourhood_fn: Option<NeighbourhoodFn>,
     pub classes: Option<HashMap<String, f64>>,
+    pub custom_weighting: bool
 }
 
 impl Default for SOMOptions {
@@ -22,7 +23,8 @@ impl Default for SOMOptions {
             sigma: None,
             decay_fn: None,
             neighbourhood_fn: None,
-            classes: None
+            classes: None,
+            custom_weighting: false
         }
     }
 }
@@ -56,6 +58,7 @@ impl<'a> Decoder<'a> for SOMOptions {
                     }
                     opts.classes = Some(classes);
                 }
+                "custom_weighting" => opts.custom_weighting = value.decode()?,
                 _ => return Err(Error::BadArg),
             }
         }
@@ -102,7 +105,7 @@ fn new<'a>(
     opts: SOMOptions
 ) -> NifResult<Term<'a>> {
     let som = SOM::create(
-        length, breadth, inputs, randomize, opts.learning_rate, opts.sigma, opts.decay_fn, opts.neighbourhood_fn, opts.classes
+        length, breadth, inputs, randomize, opts.learning_rate, opts.sigma, opts.decay_fn, opts.neighbourhood_fn, opts.classes, false
         );
      Ok((ok(), ResourceArc::new(SomResource::from(som))).encode(env))
 }
@@ -148,11 +151,17 @@ fn train_batch<'a>(env: rustler::Env<'a>, som: Rsc, data: Vec<Vec<f64>>, iterati
     return Ok(ok().encode(env));
 }
 
+#[rustler::nif]
+fn lookup_tag<'a>(env: rustler::Env<'a>, som: Rsc, x: usize, y: usize ) -> NifResult<Term<'a>> {
+    //return Ok((ok(), Atom::from_str(env, &som.read().data.tag_map[[x, y]])?).encode(env))
+    return Ok(ok().encode(env));
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // Init                                                                   //
 ////////////////////////////////////////////////////////////////////////////
 
-rustler::init!("som", [new, winner, train_random, train_random_supervised, train_random_hybrid, train_batch], load = on_load);
+rustler::init!("som", [new, winner, train_random, train_random_supervised, train_random_hybrid, train_batch, lookup_tag], load = on_load);
 
 fn on_load<'a>(env: rustler::Env<'a>, _term: rustler::Term<'a>) -> bool {
     rustler::resource!(SomResource, env);
