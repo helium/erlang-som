@@ -11,5 +11,7 @@ crate-type = ["dylib"]
 path = "native/som.rs"
 
 [dependencies]
-rusticsom = "1.1.1"
+rusticsom = { git = "https://github.com/refugeesus/RusticSOM", branch = "rfk/hybrid-mode" }
 rustler = "0.22.0-rc.0"
+serde = { version = "1.0", features = ["derive"] }
+ndarray = { version = "0.13", features = ["serde-1"] }
