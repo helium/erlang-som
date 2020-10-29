@@ -5,7 +5,7 @@ use rusticsom::{
 };
 use rustler::resource::ResourceArc;
 use rustler::types::atom::ok;
-use rustler::{Atom, Decoder, Encoder, NifResult, Term};
+use rustler::{Decoder, Encoder, NifResult, Term};
 use std::collections::HashMap;
 use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
@@ -37,35 +37,55 @@ impl<'a> Decoder<'a> for SOMOptions {
         let mut opts = Self::default();
         use rustler::{Error, MapIterator};
         for (key, value) in MapIterator::new(term).ok_or(Error::BadArg)? {
-            match key.atom_to_string()?.as_ref() {
-                "learning_rate" => opts.learning_rate = Some(value.decode()?),
-                "sigma" => opts.sigma = Some(value.decode()?),
-                "decay_fn" => {
-                    opts.decay_fn = match value.atom_to_string()?.as_ref() {
-                        "default" => Some(default_decay_fn),
-                        "exponential" => Some(exponential_decay_fn),
-                        _ => return Err(Error::BadArg),
-                    };
+            if atom::learning_rate() == key {
+                opts.learning_rate = Some(value.decode()?)
+            } else if atom::sigma() == key {
+                opts.sigma = Some(value.decode()?)
+            } else if atom::decay_fn() == key {
+                opts.decay_fn = if atom::default() == value {
+                    Some(default_decay_fn)
+                } else if atom::exponential() == value {
+                    Some(exponential_decay_fn)
+                } else {
+                    return Err(Error::BadArg);
                 }
-                "neighbourhood_fn" => {
-                    opts.neighbourhood_fn = match value.atom_to_string()?.as_ref() {
-                        "gaussian" => Some(gaussian),
-                        "mexican_hat" => Some(mh_neighborhood),
-                        _ => return Err(Error::BadArg),
-                    };
+            } else if atom::neighbourhood_fn() == key {
+                opts.neighbourhood_fn = if atom::gaussian() == value {
+                    Some(gaussian)
+                } else if atom::mexican_hat() == value {
+                    Some(mh_neighborhood)
+                } else {
+                    return Err(Error::BadArg);
                 }
-                "classes" => {
-                    let mut classes: HashMap<String, f64> = HashMap::new();
-                    for (class, weight) in MapIterator::new(value).ok_or(Error::BadArg)? {
-                        classes.insert(class.decode()?, weight.decode()?);
-                    }
-                    opts.classes = Some(classes);
+            } else if atom::classes() == key {
+                let mut classes: HashMap<String, f64> = HashMap::new();
+                for (class, weight) in MapIterator::new(value).ok_or(Error::BadArg)? {
+                    classes.insert(class.decode()?, weight.decode()?);
                 }
-                "custom_weighting" => opts.custom_weighting = value.decode()?,
-                _ => return Err(Error::BadArg),
+                opts.classes = Some(classes);
+            } else {
+                return Err(Error::BadArg);
             }
         }
         Ok(opts)
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Atoms                                                                  //
+////////////////////////////////////////////////////////////////////////////
+
+mod atom {
+    rustler::atoms! {
+        classes,
+        decay_fn,
+        default,
+        exponential,
+        gaussian,
+        learning_rate,
+        mexican_hat,
+        neighbourhood_fn,
+        sigma,
     }
 }
 
