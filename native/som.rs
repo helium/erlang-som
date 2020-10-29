@@ -153,6 +153,11 @@ fn winner<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResult<Te
 }
 
 #[rustler::nif]
+fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResult<Term<'a>> {
+    return Ok(som.write().winner_vals(Array1::from(sample)).encode(env));
+}
+
+#[rustler::nif]
 fn train_random<'a>(
     env: rustler::Env<'a>,
     som: Rsc,
@@ -226,12 +231,6 @@ fn train_batch<'a>(
     return Ok(ok().encode(env));
 }
 
-#[rustler::nif]
-fn lookup_tag<'a>(env: rustler::Env<'a>, som: Rsc, x: usize, y: usize) -> NifResult<Term<'a>> {
-    //return Ok((ok(), Atom::from_str(env, &som.read().data.tag_map[[x, y]])?).encode(env))
-    return Ok(ok().encode(env));
-}
-
 ////////////////////////////////////////////////////////////////////////////
 // Init                                                                   //
 ////////////////////////////////////////////////////////////////////////////
@@ -241,11 +240,11 @@ rustler::init!(
     [
         new,
         winner,
+        winner_vals,
         train_random,
         train_random_supervised,
         train_random_hybrid,
         train_batch,
-        lookup_tag
     ],
     load = on_load
 );

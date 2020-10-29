@@ -40,10 +40,10 @@ train_random(Config) ->
 
 train_random_supervised(Config) ->
     Samples = ?config(rows, Config),
-    {ok, SOM} = som:new(10, 10, 4, false),
+    {ok, SOM} = som:new(10, 10, 4, false, #{classes => #{<<"setosa">> => 0.0, <<"verisicolor">> => 0.0, <<"virginica">> => 0.0}}),
     %% use 60% of samples as training data
     {Supervised, Unsupervised} = lists:partition(fun(_) -> rand:uniform(100) < 60 end, Samples),
     {SupervisedSamples, SupervisedClasses} = lists:unzip(Supervised),
     som:train_random_supervised(SOM, SupervisedSamples, SupervisedClasses, 1000),
-    [ ct:pal("~p ~p ~p", [Sample, Class, som:winner(SOM, Sample)]) || {Sample, Class} <- Unsupervised ],
+    [ ct:pal("~p ~p ~p", [Sample, Class, som:winner_vals(SOM, Sample)]) || {Sample, Class} <- Unsupervised ],
     ?assert(false).

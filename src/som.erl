@@ -4,11 +4,11 @@
     new/4,
     new/5,
     winner/2,
+    winner_vals/2,
     train_random/3,
     train_random_supervised/4,
     train_random_hybrid/4,
-    train_batch/3,
-    lookup_tag/2
+    train_batch/3
 ]).
 
 -on_load(load/0).
@@ -27,6 +27,9 @@ new(_Length, _Breadth, _Inputs, _Randomize, _Options) ->
 winner(_Som, _Sample) ->
     not_loaded(?LINE).
 
+winner_vals(_Som, _Sample) ->
+    not_loaded(?LINE).
+
 train_random(_Som, _Data, _Iterations) ->
     not_loaded(?LINE).
 
@@ -37,12 +40,6 @@ train_random_hybrid(_Som, _Data, _Iterations, _Classes) ->
     not_loaded(?LINE).
 
 train_batch(_Som, _Data, _Iterations) ->
-    not_loaded(?LINE).
-
-lookup_tag(Som, {X, Y}) ->
-    lookup_tag(Som, X, Y).
-
-lookup_tag(_Som, X, Y) ->
     not_loaded(?LINE).
 
 load() ->
