@@ -97,6 +97,8 @@ mod atom {
 struct SomResource(RwLock<SOM>);
 
 impl SomResource {
+    // Get rid of this allow when/if this method is ever used
+    #[allow(dead_code)]
     fn read(&self) -> RwLockReadGuard<'_, SOM> {
         self.0.read().unwrap()
     }
