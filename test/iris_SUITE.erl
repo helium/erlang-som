@@ -45,5 +45,14 @@ train_random_supervised(Config) ->
     {Supervised, Unsupervised} = lists:partition(fun(_) -> rand:uniform(100) < 60 end, Samples),
     {SupervisedSamples, SupervisedClasses} = lists:unzip(Supervised),
     som:train_random_supervised(SOM, SupervisedSamples, SupervisedClasses, 1000),
-    [ ct:pal("~p ~p ~p", [Sample, Class, som:winner_vals(SOM, Sample)]) || {Sample, Class} <- Unsupervised ],
+    Matched = lists:foldl(fun({Sample, Class}, Acc) ->
+                                  ct:pal("~p ~p ~p", [Sample, Class, som:winner_vals(SOM, Sample)]),
+                                  case som:winner_vals(SOM, Sample) of
+                                      {_, Class} ->
+                                          Acc + 1;
+                                      _ ->
+                                          Acc
+                                  end
+                          end, 0, Unsupervised),
+    ct:pal("matched ~p/~p => ~p%", [Matched, length(Unsupervised), Matched / length(Unsupervised) * 100]),
     ?assert(false).

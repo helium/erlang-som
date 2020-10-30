@@ -16,7 +16,7 @@ pub struct SOMOptions {
     pub decay_fn: Option<DecayFn>,
     pub neighbourhood_fn: Option<NeighbourhoodFn>,
     pub classes: Option<HashMap<String, f64>>,
-    pub custom_weighting: bool,
+    pub custom_weighting: Option<bool>,
 }
 
 impl Default for SOMOptions {
@@ -27,7 +27,7 @@ impl Default for SOMOptions {
             decay_fn: None,
             neighbourhood_fn: None,
             classes: None,
-            custom_weighting: false,
+            custom_weighting: None,
         }
     }
 }
@@ -64,7 +64,7 @@ impl<'a> Decoder<'a> for SOMOptions {
                 }
                 opts.classes = Some(classes);
             } else if atom::custom_weighting() == key {
-                opts.custom_weighting = value.decode()?;
+                opts.custom_weighting = Some(value.decode()?);
             } else {
                 return Err(Error::BadArg);
             }
