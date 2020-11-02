@@ -22,7 +22,7 @@ init_per_suite(Config) ->
                          %% ignore header
                          Acc;
                    ({newline, [_Pos, _Challengee, _Witness, Signal, SNR, FSPL, Class]}, Acc) ->
-                         [{[to_num(Signal), to_num(SNR), to_num(FSPL)], list_to_binary(Class)} | Acc];
+                         [{[((to_num(Signal) - (-145))/(145)), ((to_num(SNR) - (-18))/(18 - (-18))), ((to_num(FSPL) - (-145))/(145))], list_to_binary(Class)} | Acc];
                     (_, Acc) ->
                          Acc
                  end,
@@ -39,7 +39,7 @@ train_random_supervised(Config) ->
     %% use 60% of samples as training data
     {Supervised, Unsupervised} = lists:partition(fun(_) -> rand:uniform(100) < 90 end, shuffle(Samples)),
     {SupervisedSamples, SupervisedClasses} = lists:unzip(Supervised),
-    som:train_random_supervised(SOM, SupervisedSamples, SupervisedClasses, 1000),
+    som:train_random_supervised(SOM, SupervisedSamples, SupervisedClasses, 2000),
     Matched = lists:foldl(fun({Sample, Class}, Acc) ->
                                   case som:winner_vals(SOM, Sample) of
                                       {_, Class} ->
