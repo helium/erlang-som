@@ -8,7 +8,10 @@
     train_random/3,
     train_random_supervised/4,
     train_random_hybrid/4,
-    train_batch/3
+    train_batch/3,
+    to_json/1,
+    from_json/1,
+    from_json/2
 ]).
 
 -on_load(load/0).
@@ -40,6 +43,15 @@ train_random_hybrid(_Som, _Data, _Iterations, _Classes) ->
     not_loaded(?LINE).
 
 train_batch(_Som, _Data, _Iterations) ->
+    not_loaded(?LINE).
+
+to_json(_Som) ->
+    not_loaded(?LINE).
+
+from_json(Serialized) ->
+    from_json(Serialized, #{}).
+
+from_json(_Serialized, _Options) ->
     not_loaded(?LINE).
 
 load() ->

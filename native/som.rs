@@ -1,7 +1,7 @@
 use ndarray::{Array1, Array2};
 use rusticsom::{
     default_decay_fn, exponential_decay_fn, gaussian, mh_neighborhood, DecayFn, NeighbourhoodFn,
-    SOM,
+    SOM, from_json as from_json_str,
 };
 use rustler::resource::ResourceArc;
 use rustler::types::atom::ok;
@@ -158,6 +158,29 @@ fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResu
 }
 
 #[rustler::nif]
+fn to_json<'a>(
+    env: rustler::Env<'a>,
+    som: Rsc,
+) -> NifResult<Term<'a>> {
+    match som.write().to_json() {
+        Ok(s) => Ok((ok(), s).encode(env)),
+        Err(_e) => Err(rustler::Error::BadArg),
+    }
+}
+
+#[rustler::nif]
+fn from_json<'a>(
+    env: rustler::Env<'a>,
+    serialized: String,
+    opts: SOMOptions,
+) -> NifResult<Term<'a>> {
+    match from_json_str(&serialized, opts.decay_fn, opts.neighbourhood_fn) {
+        Ok(s) => Ok((ok(), ResourceArc::new(SomResource::from(s))).encode(env)),
+        Err(_e) => Err(rustler::Error::BadArg),
+    }
+}
+
+#[rustler::nif]
 fn train_random<'a>(
     env: rustler::Env<'a>,
     som: Rsc,
@@ -245,6 +268,8 @@ rustler::init!(
         train_random_supervised,
         train_random_hybrid,
         train_batch,
+        to_json,
+        from_json,
     ],
     load = on_load
 );
