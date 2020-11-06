@@ -53,6 +53,11 @@ train_random_supervised(Config) ->
                                   end
                           end, 0, Unsupervised),
     ct:pal("matched ~p/~p => ~p%", [Matched, length(Unsupervised), Matched / length(Unsupervised) * 100]),
+    %% uncomment if you want to see the outputs
+    {ok, Serialized} = som:to_json(SOM),
+    %ct:pal("serialized ~p", [Serialized]),
+    {ok, _Deserialized} = som:from_json(Serialized),
+    %ct:pal("deserialized ~p", [Deserialized]),
     ?assert(false).
 
 to_num(String) ->
