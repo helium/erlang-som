@@ -9,7 +9,7 @@
     train_random_supervised/4,
     train_random_hybrid/4,
     train_batch/3,
-    to_json/1,
+    export_json/1,
     from_json/1,
     from_json/2
 ]).
@@ -45,7 +45,7 @@ train_random_hybrid(_Som, _Data, _Iterations, _Classes) ->
 train_batch(_Som, _Data, _Iterations) ->
     not_loaded(?LINE).
 
-to_json(_Som) ->
+export_json(_Som) ->
     not_loaded(?LINE).
 
 from_json(Serialized) ->

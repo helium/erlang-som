@@ -158,7 +158,7 @@ fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResu
 }
 
 #[rustler::nif]
-fn to_json<'a>(
+fn export_json<'a>(
     env: rustler::Env<'a>,
     som: Rsc,
 ) -> NifResult<Term<'a>> {
@@ -268,7 +268,7 @@ rustler::init!(
         train_random_supervised,
         train_random_hybrid,
         train_batch,
-        to_json,
+        export_json,
         from_json,
     ],
     load = on_load
