@@ -17,6 +17,7 @@ pub struct SOMOptions {
     pub neighbourhood_fn: Option<NeighbourhoodFn>,
     pub classes: Option<HashMap<String, f64>>,
     pub custom_weighting: Option<bool>,
+    pub random_seed: Option<Vec<u8>>,
 }
 
 impl Default for SOMOptions {
@@ -28,6 +29,7 @@ impl Default for SOMOptions {
             neighbourhood_fn: None,
             classes: None,
             custom_weighting: None,
+            random_seed: None,
         }
     }
 }
@@ -65,6 +67,8 @@ impl<'a> Decoder<'a> for SOMOptions {
                 opts.classes = Some(classes);
             } else if atom::custom_weighting() == key {
                 opts.custom_weighting = Some(value.decode()?);
+            } else if atom::random_seed() == key {
+                opts.random_seed = Some(value.decode()?);
             } else {
                 return Err(Error::BadArg);
             }
@@ -89,6 +93,7 @@ mod atom {
         mexican_hat,
         neighbourhood_fn,
         sigma,
+        random_seed,
     }
 }
 
@@ -143,6 +148,22 @@ fn new<'a>(
         opts.neighbourhood_fn,
         opts.classes,
         opts.custom_weighting,
+        match opts.random_seed {
+            Some(v) => {
+                if v.capacity() == 32 {
+                    let mut arr = [0u8;32];
+                    for i in 0..32 {
+                        arr[i] = v[i];
+                    }
+                    Some(arr)
+                } else {
+                    panic!("Expected u8 Vec with capacity 32! got: {}", v.capacity());
+                }
+            }
+            None => {
+                None
+            }
+        }
     );
     Ok((ok(), ResourceArc::new(SomResource::from(som))).encode(env))
 }
