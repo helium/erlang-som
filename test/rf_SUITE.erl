@@ -37,10 +37,11 @@ train_random_supervised(Config) ->
     Samples = ?config(rows, Config),
     {ok, SOM} = som:new(15, 15, 3, false, #{classes => #{<<"1">> => 1.7, <<"0">> => 0.6},
                                             custom_weighting => false,
+                                            sigma => 0.75,
                                             random_seed => [209,162,182,84,44,167,62,240,152,122,118,154,48,208,143,84,
                                                              186,211,219,113,71,108,171,185,51,159,124,176,167,192,23,245]}),
 
-    %% use 60% of samples as training data
+    _ = rand:seed(exsp, {901324200495623, 139888701234, 23499291264}),
     {Supervised, Unsupervised} = lists:partition(fun(_) -> rand:uniform(100) < 90 end, shuffle(Samples)),
     {SupervisedSamples, SupervisedClasses} = lists:unzip(Supervised),
     som:train_random_supervised(SOM, SupervisedSamples, SupervisedClasses, 2000),
@@ -72,5 +73,4 @@ to_num(String) ->
     end.
 
 shuffle(List) ->
-	_ = rand:seed(exsp, {123, 1234, 12345}),
     [X || {_,X} <- lists:sort([{rand:uniform(), N} || N <- List])].
