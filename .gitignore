@@ -20,5 +20,4 @@ rebar3.crashdump
 *~
 
 # Rust
-Cargo.lock
 so-path
