@@ -398,7 +398,7 @@ checksum = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 [[package]]
 name = "rusticsom"
 version = "1.1.1"
-source = "git+https://github.com/refugeesus/RusticSOM?branch=rfk/hybrid-mode-dev#d76d54d770346670f26534830bb592531e09b8b8"
+source = "git+https://github.com/refugeesus/RusticSOM?branch=rfk/hybrid-mode-dev#9778b7b86c73f0691bb4f2a87d26c7ab7fa7976c"
 dependencies = [
  "csv",
  "log",
