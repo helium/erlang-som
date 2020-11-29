@@ -3,11 +3,15 @@ use rusticsom::{
     default_decay_fn, exponential_decay_fn, gaussian, mh_neighborhood, DecayFn, NeighbourhoodFn,
     SOM,
 };
-use rustler::resource::ResourceArc;
-use rustler::types::atom::ok;
-use rustler::{Decoder, Encoder, NifResult, Term};
-use std::collections::HashMap;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use rustler::{
+    resource::ResourceArc,
+    types::atom::ok,
+    {Decoder, Encoder, NifResult, Term},
+};
+use std::{
+    collections::HashMap,
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+};
 
 #[derive(PartialEq, Clone, Debug)]
 pub struct SOMOptions {
@@ -158,11 +162,7 @@ fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> Term<'a
 }
 
 #[rustler::nif]
-fn train_random(
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    iterations: u32,
-) {
+fn train_random(som: Rsc, data: Vec<Vec<f64>>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
@@ -180,38 +180,27 @@ fn train_random_supervised(
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
-    som.write()
-        .train_random_supervised(
-            Array2::from_shape_vec(shape, flat).unwrap(),
-            Array1::from(class_data),
-            iterations,
-        );
+    som.write().train_random_supervised(
+        Array2::from_shape_vec(shape, flat).unwrap(),
+        Array1::from(class_data),
+        iterations,
+    );
 }
 
 #[rustler::nif]
-fn train_random_hybrid(
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    class_data: Vec<String>,
-    iterations: u32,
-) {
+fn train_random_hybrid(som: Rsc, data: Vec<Vec<f64>>, class_data: Vec<String>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
-    som.write()
-        .train_random_hybrid(
-            Array2::from_shape_vec(shape, flat).unwrap(),
-            Array1::from(class_data),
-            iterations,
-        );
+    som.write().train_random_hybrid(
+        Array2::from_shape_vec(shape, flat).unwrap(),
+        Array1::from(class_data),
+        iterations,
+    );
 }
 
 #[rustler::nif]
-fn train_batch(
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    iterations: u32,
-) {
+fn train_batch(som: Rsc, data: Vec<Vec<f64>>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
