@@ -13,7 +13,7 @@ use std::{
     sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
 };
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, Default)]
 pub struct SOMOptions {
     pub learning_rate: Option<f32>,
     pub sigma: Option<f32>,
@@ -21,19 +21,6 @@ pub struct SOMOptions {
     pub neighbourhood_fn: Option<NeighbourhoodFn>,
     pub classes: Option<HashMap<String, f64>>,
     pub custom_weighting: Option<bool>,
-}
-
-impl Default for SOMOptions {
-    fn default() -> SOMOptions {
-        SOMOptions {
-            learning_rate: None,
-            sigma: None,
-            decay_fn: None,
-            neighbourhood_fn: None,
-            classes: None,
-            custom_weighting: None,
-        }
-    }
 }
 
 impl<'a> Decoder<'a> for SOMOptions {
