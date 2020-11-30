@@ -18,6 +18,7 @@ _build
 *.iml
 rebar3.crashdump
 *~
+rebar.lock
 
 # Rust
 Cargo.lock
