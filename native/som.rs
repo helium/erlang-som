@@ -3,13 +3,17 @@ use rusticsom::{
     default_decay_fn, exponential_decay_fn, gaussian, mh_neighborhood, DecayFn, NeighbourhoodFn,
     SOM,
 };
-use rustler::resource::ResourceArc;
-use rustler::types::atom::ok;
-use rustler::{Decoder, Encoder, NifResult, Term};
-use std::collections::HashMap;
-use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
+use rustler::{
+    resource::ResourceArc,
+    types::atom::ok,
+    {Decoder, Encoder, NifResult, Term},
+};
+use std::{
+    collections::HashMap,
+    sync::{RwLock, RwLockReadGuard, RwLockWriteGuard},
+};
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Clone, Debug, Default)]
 pub struct SOMOptions {
     pub learning_rate: Option<f32>,
     pub sigma: Option<f32>,
@@ -17,19 +21,6 @@ pub struct SOMOptions {
     pub neighbourhood_fn: Option<NeighbourhoodFn>,
     pub classes: Option<HashMap<String, f64>>,
     pub custom_weighting: Option<bool>,
-}
-
-impl Default for SOMOptions {
-    fn default() -> SOMOptions {
-        SOMOptions {
-            learning_rate: None,
-            sigma: None,
-            decay_fn: None,
-            neighbourhood_fn: None,
-            classes: None,
-            custom_weighting: None,
-        }
-    }
 }
 
 impl<'a> Decoder<'a> for SOMOptions {
@@ -148,87 +139,60 @@ fn new<'a>(
 }
 
 #[rustler::nif]
-fn winner<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResult<Term<'a>> {
-    return Ok(som.write().winner(Array1::from(sample)).encode(env));
+fn winner<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> Term<'a> {
+    som.write().winner(Array1::from(sample)).encode(env)
 }
 
 #[rustler::nif]
-fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> NifResult<Term<'a>> {
-    return Ok(som.write().winner_vals(Array1::from(sample)).encode(env));
+fn winner_vals<'a>(env: rustler::Env<'a>, som: Rsc, sample: Vec<f64>) -> Term<'a> {
+    som.write().winner_vals(Array1::from(sample)).encode(env)
 }
 
 #[rustler::nif]
-fn train_random<'a>(
-    env: rustler::Env<'a>,
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    iterations: u32,
-) -> NifResult<Term<'a>> {
+fn train_random(som: Rsc, data: Vec<Vec<f64>>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
     som.write()
-        .train_random(Array2::from_shape_vec(shape, flat).unwrap(), iterations)
-        .encode(env);
-    return Ok(ok().encode(env));
+        .train_random(Array2::from_shape_vec(shape, flat).unwrap(), iterations);
 }
 
 #[rustler::nif]
-fn train_random_supervised<'a>(
-    env: rustler::Env<'a>,
+fn train_random_supervised(
     som: Rsc,
     data: Vec<Vec<f64>>,
     class_data: Vec<String>,
     iterations: u32,
-) -> NifResult<Term<'a>> {
+) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
-    som.write()
-        .train_random_supervised(
-            Array2::from_shape_vec(shape, flat).unwrap(),
-            Array1::from(class_data),
-            iterations,
-        )
-        .encode(env);
-    return Ok(ok().encode(env));
+    som.write().train_random_supervised(
+        Array2::from_shape_vec(shape, flat).unwrap(),
+        Array1::from(class_data),
+        iterations,
+    );
 }
 
 #[rustler::nif]
-fn train_random_hybrid<'a>(
-    env: rustler::Env<'a>,
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    class_data: Vec<String>,
-    iterations: u32,
-) -> NifResult<Term<'a>> {
+fn train_random_hybrid(som: Rsc, data: Vec<Vec<f64>>, class_data: Vec<String>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
-    som.write()
-        .train_random_hybrid(
-            Array2::from_shape_vec(shape, flat).unwrap(),
-            Array1::from(class_data),
-            iterations,
-        )
-        .encode(env);
-    return Ok(ok().encode(env));
+    som.write().train_random_hybrid(
+        Array2::from_shape_vec(shape, flat).unwrap(),
+        Array1::from(class_data),
+        iterations,
+    );
 }
 
 #[rustler::nif]
-fn train_batch<'a>(
-    env: rustler::Env<'a>,
-    som: Rsc,
-    data: Vec<Vec<f64>>,
-    iterations: u32,
-) -> NifResult<Term<'a>> {
+fn train_batch(som: Rsc, data: Vec<Vec<f64>>, iterations: u32) {
     let inner_shape = data[0].len();
     let shape = (data.len(), inner_shape);
     let flat: Vec<f64> = data.iter().flatten().cloned().collect();
     som.write()
-        .train_batch(Array2::from_shape_vec(shape, flat).unwrap(), iterations)
-        .encode(env);
-    return Ok(ok().encode(env));
+        .train_batch(Array2::from_shape_vec(shape, flat).unwrap(), iterations);
 }
 
 ////////////////////////////////////////////////////////////////////////////
